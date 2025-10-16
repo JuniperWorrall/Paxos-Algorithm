@@ -21,6 +21,7 @@ public class Network {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(Socket.getInputStream()));
             String Line = br.readLine();
+            if(Line == null || Line.isEmpty()) return null;
             return Message.FromNode(Line);
         } catch (Exception e){
             System.err.println("Recieve failed: " + e.getMessage());

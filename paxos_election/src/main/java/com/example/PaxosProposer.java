@@ -58,20 +58,19 @@ public class PaxosProposer {
         if (st.AcceptedCount() < Quorum) {
             System.out.println(Node.MemberID + " -> failed to gather majority ACCEPTED for " + ProposalID);
         } else {
-            System.out.println(Node.MemberID + " -> proposal succeeded: " + st.Value);
             Node.Learner.HandleAccepted(new Message("ACCEPTED", Node.MemberID, ProposalID, null, st.Value));
         }
     }
 
     public void HandlePromise(Message Msg) {
-        if (Msg == null || Msg.ProposalNum == null) return;
-        ProposalState st = States.get(Msg.ProposalNum);
+        if (Msg == null || Msg.AcceptedProposalNum == null) return;
+        ProposalState st = States.get(Msg.AcceptedProposalNum);
         if (st == null) return;
 
         st.AddPromise(Msg.Sender);
 
-        if (Msg.AcceptedNum != null && !Msg.AcceptedNum.isEmpty() && Msg.AcceptedNum.length() > 0) {
-            ProposalNumber an = ProposalNumber.Parse(Msg.AcceptedNum);
+        if (Msg.AcceptedProposalNum != null && !Msg.AcceptedProposalNum.isEmpty() && Msg.AcceptedProposalNum.length() > 0) {
+            ProposalNumber an = ProposalNumber.Parse(Msg.AcceptedProposalNum);
             if (an != null) {
                 st.MaybeAdoptHigher(an, Msg.Value);
             }

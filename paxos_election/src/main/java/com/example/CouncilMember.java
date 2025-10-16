@@ -31,17 +31,25 @@ public class CouncilMember {
         new Thread(this::ReceiveLoop, "recv-" + ID).start();
     }
 
+    public PaxosProposer GetProposer() {
+        return Proposer;
+    }
+
+    public PaxosLearner GetLearner() {
+        return Learner;
+    }
+
     private void ReceiveLoop() {
         System.out.println(MemberID + " listening on port " + Listener.getLocalPort());
         while (Running) {
             try {
                 Socket s = Listener.accept();
                 new Thread(() -> {
-                    Message msg = Network.Recieve(s);
-                    if (msg == null) return;
+                    Message Msg = Network.Recieve(s);
+                    if (Msg == null) return;
 
                     if (!DelaySimulator.ApplyDelay(this.Profile)) return;
-                    Dispatch(msg);
+                    Dispatch(Msg);
                 }).start();
             } catch (IOException e) {
                 if (Running) System.err.println("Accept error: " + e.getMessage());
@@ -107,7 +115,7 @@ public class CouncilMember {
         }
     }
 
-    public static void Main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         if (args.length < 2) {
             System.err.println("Usage: java com.example.CouncilMember <MemberId> <profile> [configFile]");
             System.err.println("Example: java com.example.CouncilMember M1 reliable network.config");
