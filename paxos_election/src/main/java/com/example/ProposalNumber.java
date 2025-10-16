@@ -9,14 +9,14 @@ public class ProposalNumber {
         this.MemberID = MemberID;
     }
 
-    public static ProposalNumber parse(String NewNum){
+    public static ProposalNumber Parse(String NewNum){
         if (NewNum == null) return null;
         String[] Parts = NewNum.split("-", 2);
         if(Parts.length != 2) return null;
         return new ProposalNumber(Long.parseLong(Parts[0]), Parts[1]);
     }
 
-    public int compareTo(ProposalNumber Num){
+    public int CompareTo(ProposalNumber Num){
         if(Num == null) return 1;
         int C = Long.compare(this.Counter, Num.Counter);
         if(C != 0) return C;
