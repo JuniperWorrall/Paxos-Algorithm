@@ -58,6 +58,7 @@ public class CouncilMember {
     }
 
     private void Dispatch(Message Msg) {
+        if (PaxosLearner.Decided.get()) return;
         switch (Msg.Type) {
             case "PREPARE":
                 Acceptor.HandlePrepare(Msg);
@@ -69,7 +70,6 @@ public class CouncilMember {
                 Acceptor.HandleAcceptRequest(Msg);
                 break;
             case "ACCEPTED":
-                Proposer.HandleAccepted(Msg);
                 Learner.HandleAccepted(Msg);
                 break;
             default:
@@ -78,6 +78,7 @@ public class CouncilMember {
     }
 
     public void SendMessage(String TargetID, Message Msg) {
+        if (PaxosLearner.Decided.get()) return;
         InetSocketAddress Addr = NetworkMap.get(TargetID);
         if (Addr == null) {
             System.err.println("Unknown target: " + TargetID);
@@ -107,7 +108,14 @@ public class CouncilMember {
                 }
                 if (!Line.isEmpty()) {
                     System.out.println(MemberID + " proposing " + Line);
-                    new Thread(() -> Proposer.InitiateProposal(Line)).start();
+                    new Thread(() -> {
+                        try {
+                            Proposer.InitiateProposal(Line);
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            System.err.println("Proposal interrupted: " + ie.getMessage());
+                        }
+                    }).start();
                 }
             }
         } catch (Exception e) {

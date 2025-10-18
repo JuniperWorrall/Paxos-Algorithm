@@ -3,6 +3,7 @@ package com.example;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,15 +29,6 @@ public class AppTest
         Thread.sleep(500);
     }
 
-    private void ShutdownMembers() throws InterruptedException {
-        for (CouncilMember Member : Members) {
-            try {
-                Member.Shutdown(); 
-            } catch (Exception i){}
-        }
-        Thread.sleep(500);
-    }
-
     private String WaitForConsensus(long TimeoutMillis) throws InterruptedException {
         long StartTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - StartTime < TimeoutMillis) {
@@ -51,7 +43,16 @@ public class AppTest
         return null; 
     }
 
-    //Ideal Network
+    @AfterEach
+    void TearDown() {
+        for (CouncilMember M : Members) {
+            M.Shutdown();
+        }
+        Members.clear();
+
+        try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+    }
+
     @Test
     @Order(1)
     public void TestIdealNetwork() throws Exception {
@@ -61,7 +62,6 @@ public class AppTest
 
         assertNotNull(Result, "Consensus should be reached");
         assertEquals("M5", Result, "M5 should be elected");
-        ShutdownMembers();
     }
 
     @Test
@@ -75,7 +75,6 @@ public class AppTest
 
         assertNotNull(Result, "Consensus should be reached");
         assertTrue(Result.equals("M1") || Result.equals("M8"), "Consensus should pick one valid candidate");
-        ShutdownMembers();
     }
 
     @Test
@@ -103,6 +102,5 @@ public class AppTest
         FailedMember.Shutdown();
         String Result3 = WaitForConsensus(8000);
         assertNotNull(Result3, "Consensus recover from member failure and reach consensus");
-        ShutdownMembers();
     }
 }

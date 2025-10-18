@@ -3,7 +3,7 @@
 set -e
 trap 'kill 0' EXIT
 
-PROJECT_ROOT=$(cd "$(dirname "$0")/../../../../.." && pwd)
+PROJECT_ROOT=$(cd "$(dirname "$0")/../../../.." && pwd)
 CLASS_PATH="$PROJECT_ROOT/target/classes"
 CONFIG_FILE="network_config"
 
@@ -19,6 +19,7 @@ LaunchMembers() {
 
     for i in $(seq 1 $RELIABLE); do
         ID="M$CURRENT"
+        echo "Class path: $CLASS_PATH"
         java -cp "$CLASS_PATH" com.example.CouncilMember "$ID" RELIABLE "$CONFIG_FILE" >> "logs/$ID.log" 2>&1 &
         PIDS+=($!)
         CURRENT=$((CURRENT + 1))

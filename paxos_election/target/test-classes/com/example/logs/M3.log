@@ -1,2 +1,7 @@
 [M3] CLI started. Type candidate name or 'quit'.
 M3 listening on port 9003
+M3 proposing M3
+M3 simulated drop sending to M2
+M3 simulated drop sending to M8
+M3 -> gathered 5 PROMISEs for 1-M3
+CONSENSUS: M3 has been elected Council President!
